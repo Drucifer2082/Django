@@ -1,10 +1,11 @@
-from subprocess import IDLE_PRIORITY_CLASS
 from django.shortcuts import render
 
-# Create your views here.
+from .models import Article
+
+
 def index(response, id):
-    ls = NewsList.objects.get(id=id)
-    return render(response, "main/list.html", {"ls":ls})
+    article = Article.objects.get(id=id)
+    return render(response, "main/list.html", {"article": article})
 
 
 def home(response):
