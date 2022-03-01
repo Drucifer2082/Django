@@ -7,8 +7,8 @@ article_corpus = []
 # Creates a set of frequent words
 stoplist = set('for a of the and to in'.split(' '))
 # Lowercase each document, split it by white space and filter out stopwords
-texts = [[word for word in document.lower().split() if word not in stoplist]
-         for document in article_corpus]
+texts = [[word for word in article.lower().split() if word not in stoplist]
+         for article in article_corpus]
 
 # Counts word frequencies
 frequency = defaultdict(int)
