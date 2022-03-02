@@ -11,7 +11,7 @@ texts = [[word for word in article.lower().split() if word not in stoplist]
          for article in article_corpus]
 
 # Counts word frequencies
-frequency = colctions.Counter(int)
+frequency = collections.Counter(int)
 for text in texts:
     for token in text:
         frequency[token] += 1
