@@ -35,7 +35,7 @@ new_vec = dictionary.doc2bow(new_search.lower().split())
 print(new_vec)
 
 bow_corpus = [dictionary.doc2bow(text) for text in processed_corpus]
-pprint.pprint(bow_corpus)
+print(bow_corpus)
 
 
 # train the model
