@@ -18,7 +18,7 @@ for text in texts:
 
 # Only keep words that appear more than once
 processed_corpus = [[token for token in text if frequency[token] > 1] for text in texts]
-pprint.pprint(processed_corpus)
+print(processed_corpus)
 
 """corpora associates each word in the corpus with a unique integer ID. 
 This dictionary defines the vocabulary of all words that our processing knows about."""
