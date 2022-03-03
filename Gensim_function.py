@@ -1,6 +1,8 @@
 import collections
 from gensim import corpora, models, similarities
 
+from .scraper import get_theguardian_articles, parse_theguardian_article
+
 article = "Russia has pledged to stand its ground against what it calls “hostile actions” but has accepted that its economy will take a significant hit from the extensive sanctions imposed by the west in response to its invasion of Ukraine."
 
 article_corpus = [ "Economists expect the sanctions to push Russia into a deep recession while driving inflation even higher this year, but do not think the economy will fail to function as long as the political will in the Kremlin exists to soften the impact of the measures.",
@@ -10,6 +12,7 @@ article_corpus = [ "Economists expect the sanctions to push Russia into a deep r
 # Creates a set of frequent words
 stoplist = set('for a of the and to in'.split(' '))
 # Lowercase each document, split it by white space and filter out stopwords
+# TODO: gensim.parsing.preprocessing.remove_stopword_tokens
 texts = [[word for word in article.lower().split() if word not in stoplist]
          for article in article_corpus]
 
@@ -23,7 +26,7 @@ for text in texts:
 processed_corpus = [[token for token in text if frequency[token] > 1] for text in texts]
 print(processed_corpus)
 
-"""corpora associates each word in the corpus with a unique integer ID. 
+"""corpora associates each word in the corpus with a unique integer ID.
 This dictionary defines the vocabulary of all words that our processing knows about."""
 
 article_identifiers = corpora.Dictionary(processed_corpus)
