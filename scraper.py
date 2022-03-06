@@ -24,7 +24,7 @@ def parse_theguardian_article(url):
     query = requests.get(url)
     ret = query.json()
     try:
-        ret = ret['response']['content']['blocks']['body'][0]['bodyHtml']
+        ret = ret["response"]["results"][0]["blocks"]['body'][0]['bodyHtml']
     except IndexError:
         raise NoContentException(f"cannot retrieve article content of {url}")
     # strip html tags off
@@ -41,6 +41,11 @@ def historical_news_api(search):
     historical_news_results = requests.request("GET", url, headers=headers, params=search)
 
     return historical_news_results
+
+def parse_historical_news_api(url)
+
+
+
 
 
 def google_news_api(search):
