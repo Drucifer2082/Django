@@ -1,40 +1,40 @@
+from collections import namedtuple
 import re
 
 import requests
 
 guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
+Article = namedtuple("Article", "title url")
 
 
 class NoContentException(Exception):
     pass
 
 
-def get_theguardian_articles(search):
+def _get_theguardian_search_data(search):
     """API key and query search for the GuardianUK. The API stores all articles, images, audio and videos dating back to 1999"""
     url = f"https://content.guardianapis.com/search?q={search}&api-key={guardian_api_key}"
     query = requests.get(url)
-    guardian_results = query.json()
-    return guardian_results
+    resp = query.json()
+    return resp
 
-def get_theguardian_titles(search):
-    url = f"https://content.guardianapis.com/search?q={search}&api-key={guardian_api_key}&show-blocks=all"
-    query = requests.get(url)
-    ret = query.json()
-    try:
-        article_title = ret['response']['results'][0]['webTitle']
-    except IndexError:
-        raise NoContentException(f"cannot retrieve article content of {url}")    
-    
-    return article_title
 
-def parse_theguardian_article(search):
-    url = f"https://content.guardianapis.com/search?q={search}&api-key={guardian_api_key}&show-blocks=all"
+def get_theguardian_articles(search):
+    resp = _get_theguardian_search_data(search)
+    articles = [Article(art["webTitle"], art["apiUrl"])
+                 for art in resp["response"]["results"]]
+    return articles
+
+
+def parse_theguardian_article(url):
+    if "api-key" not in url:
+        url += f"?api-key={guardian_api_key}&show-blocks=all"
     query = requests.get(url)
-    ret = query.json()
+    resp = query.json()
     try:
-        ret = ret["response"]["results"][0]["blocks"]['body'][0]['bodyHtml']
-    except IndexError:
+        ret = resp["response"]["content"]["blocks"]['body'][0]['bodyHtml']
+    except (IndexError, KeyError):
         raise NoContentException(f"cannot retrieve article content of {url}")
     # strip html tags off
     return re.sub('<[^<]+?>', '', ret)
@@ -45,7 +45,7 @@ def historical_news_api(search):
     query = requests.get(url)
     nytimes_historical_results = query.json()
     return nytimes_historical_results
-    
+
 def parse_historical_news_api_headline(nytimes_results, nytimes_historical_results):
     nytimes_results_print_headline = nytimes_results['response']['docs'][0]['headline']['print_headline']
     return nytimes_results_print_headline
