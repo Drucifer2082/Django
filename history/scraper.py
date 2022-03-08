@@ -6,6 +6,7 @@ import requests
 guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
 Article = namedtuple("Article", "title url")
+
 top_headlines_api ="67a718ca0c904911b885f859c255dc21"
 
 class NoContentException(Exception):
@@ -42,16 +43,16 @@ def parse_theguardian_article(url):
 
 
 def historical_news_api(search):
+    resp = _get_historical_news_search_data(search)
+    historical_articles = [Article(art['headline']['print_headline'], art['section_name'], art            ['lead_paragraph'])
+                    for art in resp['response']['docs'][0]]
+    return historical_articles
+
+def  _get_historical_news_search_data(search):
     url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q={search}&api-key={nytimes_historical_api}&show-blocks=all"
     query = requests.get(url)
     nytimes_historical_results = query.json()
     return nytimes_historical_results
-
-def parse_historical_news_api(nytimes_historical_results):
-    nytimes_results_print_headline = nytimes_historical_results['response']['docs'][0]['headline']['print_headline']
-    nytimes_results_section_name = nytimes_historical_results['response']['docs'][0]['section_name']
-    nytimes_results_lead_paragraph = nytimes_historical_results['response']['docs'][0]['lead_paragraph']
-    return namedtuple(nytimes_results_print_headline, nytimes_results_section_name,nytimes_results_lead_paragraph)
 
 def daily_top_headlines():
     """ shows live headlines in near real time."""

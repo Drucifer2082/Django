@@ -12,7 +12,6 @@ def collecting_articles(article):
 
     return article_corpus
 
-
 def telegraphic_text_single_article(article):
     """removes stopwords, predefined by Gensim, across the text."""
     filtered_article = remove_stopwords(article)
@@ -25,7 +24,7 @@ def telegraphic_text_multiple_articles(article_corpus):
 
 def article_analysis(filtered_article, article_corpus):
     """The Natural Language Processing analysis on the articles....
-    and returns a dictionary bag-of-words  of each article's keywords"""
+    returns a dictionary bag-of-words vector"""
     # Creates an additional set of stop words, final check to make sure some words do not get through
     stoplist = set('for a of the and to in but'.split(' '))
     # Lowercase each document, split it by white space and filter out stopwords
