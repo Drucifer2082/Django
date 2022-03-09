@@ -1,15 +1,13 @@
 import collections
 from gensim import corpora, models, similarities
 from gensim import utils
-from gensim.parsing.preprocessing import remove_stopwords, preprocess_documents, preprocess_string
+from gensim.parsing.preprocessing import remove_stopwords, preprocess_documents
 
 from .scraper import get_theguardian_articles, parse_theguardian_article
 
 def collecting_articles(article):
     """building the corpus for  ML"""
-    article_corpus = []
-    article_corpus.append(article)
-
+    article_corpus = [article]
     return article_corpus
 
 def telegraphic_text_single_article(article):
@@ -18,7 +16,7 @@ def telegraphic_text_single_article(article):
     return filtered_article
 
 def telegraphic_text_multiple_articles(article_corpus):
-    """removes stopwords across multiple texts.... returns dictionaries"""
+    """removes stopwords across multiple texts."""
     post_processed_articles = preprocess_documents(article_corpus)
     return post_processed_articles
 
