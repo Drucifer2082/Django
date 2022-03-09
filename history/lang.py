@@ -5,8 +5,12 @@ from gensim.parsing.preprocessing import remove_stopwords, preprocess_documents,
 
 from .scraper import get_theguardian_articles, parse_theguardian_article
 
-article = """the original article or one selected from ???  not quite sure yet """
-article_corpus = ["""my thought is this is where the selected texts will end up to be processed"""]
+def collecting_articles(article):
+    """building the corpus for  ML"""
+    article_corpus = []
+    article_corpus.append(article)
+
+    return article_corpus
 
 def telegraphic_text_single_article(article):
     """removes stopwords, predefined by Gensim, across the text."""
@@ -18,9 +22,9 @@ def telegraphic_text_multiple_articles(article_corpus):
     post_processed_articles = preprocess_documents(article_corpus)
     return post_processed_articles
 
-def article_analysis(filtered_article):
+def article_analysis(filtered_article, article_corpus):
     """The Natural Language Processing analysis on the articles....
-    and returns a dictionary bag-of-words  of each article's keywords"""
+    returns a dictionary bag-of-words vector"""
     # Creates an additional set of stop words, final check to make sure some words do not get through
     stoplist = set('for a of the and to in but'.split(' '))
     # Lowercase each document, split it by white space and filter out stopwords
@@ -34,12 +38,12 @@ def article_analysis(filtered_article):
             frequency[token] += 1
 
     # Only keeps words that appear more than once
-    processed_corpus = [[token for token in text if frequency[token] > 1] for text in texts]
-    return processed_corpus
+    processed_article = [[token for token in text if frequency[token] > 1] for text in texts]
+    return processed_article
     
-def selected_article_topical_keywords(processed_corpus):
+def selected_article_topical_keywords(processed_article):
     stoplist = set('for a of the and to in but'.split(' '))
-    dictionary = corpora.Dictionary(processed_corpus)
+    dictionary = corpora.Dictionary(processed_article)
     # remove stop words and words that appear only once
     stop_ids = [
         dictionary.token2id[stopword]
@@ -52,10 +56,10 @@ def selected_article_topical_keywords(processed_corpus):
     article_keyword_dictionary = dictionary
     return article_keyword_dictionary
 
-def keywords_into_vectors(processed_corpus):
-    dictionary = corpora.Dictionary(processed_corpus)
-    bow_corpus = [dictionary.doc2bow(text) for text in processed_corpus]
-    return bow_corpus, dictionary
+def keywords_into_vectors(processed_article):
+    dictionary = corpora.Dictionary(processed_article)
+    bow_corpus = [dictionary.doc2bow(text) for text in processed_article]
+    return bow_corpus
 
 def training_the_model(bow_corpus):
     """TF-IDF is a statistical measure that evaluates how relevant a word is to a document in a collection of documents."""
@@ -63,8 +67,8 @@ def training_the_model(bow_corpus):
     index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=12)
     return index, tfidf
 
-def searching_the_articles(index, tfidf, processed_corpus):
-    dictionary = corpora.Dictionary(processed_corpus)
+def searching_the_articles(index, tfidf, processed_article):
+    dictionary = corpora.Dictionary(processed_article)
     query = 'russian economy'.split()
     query_bow = dictionary.doc2bow(query)
     sims = index[tfidf[query_bow]]

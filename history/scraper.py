@@ -7,6 +7,7 @@ guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
 Article = namedtuple("Article", "title url")
 
+top_headlines_api ="67a718ca0c904911b885f859c255dc21"
 
 class NoContentException(Exception):
     pass
@@ -37,32 +38,27 @@ def parse_theguardian_article(url):
     except (IndexError, KeyError):
         raise NoContentException(f"cannot retrieve article content of {url}")
     # strip html tags off
-    return re.sub('<[^<]+?>', '', ret)
+    article = re.sub('<[^<]+?>', '', ret)
+    return article
 
 
 def historical_news_api(search):
+    resp = _get_historical_news_search_data(search)
+    historical_articles = [Article(art['headline']['print_headline'], art['section_name'], art            ['lead_paragraph'])
+                    for art in resp['response']['docs'][0]]
+    return historical_articles
+
+def  _get_historical_news_search_data(search):
     url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q={search}&api-key={nytimes_historical_api}&show-blocks=all"
     query = requests.get(url)
     nytimes_historical_results = query.json()
     return nytimes_historical_results
 
-def parse_historical_news_api_headline(nytimes_results, nytimes_historical_results):
-    nytimes_results_print_headline = nytimes_results['response']['docs'][0]['headline']['print_headline']
-    return nytimes_results_print_headline
-
-def parse_historical_news_api_section(nytimes_results, nytimes_historical_results):
-    nytimes_results_section_name = nytimes_results['response']['docs'][0]['section_name']
-    return nytimes_results_section_name
-
-def parse_historical_news_api_lead_paragraph(nytimes_results, nytimes_historical_results):
-    nytimes_results_lead_paragraph = nytimes_results['response']['docs'][0]['section_name']
-    return nytimes_results_lead_paragraph
-
 def daily_top_headlines():
     """ shows live headlines in near real time."""
-    url = ('https://newsapi.org/v2/top-headlines?'
+    url = (f'https://newsapi.org/v2/top-headlines?'
            'country=us&'
-           'apiKey=67a718ca0c904911b885f859c255dc21')
+           'apiKey={top_headlines_api}')
     response = requests.get(url)
     top_headlines = response.json()
     return top_headlines
@@ -70,7 +66,7 @@ def daily_top_headlines():
 def parse_daily_top_headlines_titles():
     url = url = ('https://newsapi.org/v2/top-headlines?'
            'country=us&'
-           'apiKey=67a718ca0c904911b885f859c255dc21')
+           'apiKey={top_headlines_api}')
     query = requests.get(url)
     ret = query.json()
     try:
