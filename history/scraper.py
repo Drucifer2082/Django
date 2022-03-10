@@ -6,7 +6,7 @@ import requests
 guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
 Article = namedtuple("Article", "title url")
-
+HistoricArticle = namedtuple("HistoricArticle", "print_headline, section_name, lead_paragraph")
 top_headlines_api ="67a718ca0c904911b885f859c255dc21"
 
 class NoContentException(Exception):
@@ -44,8 +44,15 @@ def parse_theguardian_article(url):
 
 def historical_news_api(search):
     resp = _get_historical_news_search_data(search)
-    historical_articles = [Article(art['headline']['print_headline'], art['section_name'], art            ['lead_paragraph'])
+    """
+    historical_articles = [HistoricArticle(art['headline']['print_headline'], art['section_name'], art            ['lead_paragraph'])
                     for art in resp['response']['docs'][0]]
+    """
+    # TODO: scrape them!
+    historical_articles = [
+        row["lead_paragraph"] for row in
+        resp['response']['docs']
+    ]
     return historical_articles
 
 def  _get_historical_news_search_data(search):
