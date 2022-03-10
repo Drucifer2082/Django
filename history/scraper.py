@@ -44,8 +44,15 @@ def parse_theguardian_article(url):
 
 def historical_news_api(search):
     resp = _get_historical_news_search_data(search)
+    """
     historical_articles = [HistoricArticle(art['headline']['print_headline'], art['section_name'], art            ['lead_paragraph'])
                     for art in resp['response']['docs'][0]]
+    """
+    # TODO: scrape them!
+    historical_articles = [
+        row["lead_paragraph"] for row in
+        resp['response']['docs']
+    ]
     return historical_articles
 
 def  _get_historical_news_search_data(search):
