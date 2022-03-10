@@ -1,11 +1,11 @@
 import argparse
 import sys
 
-from .scraper import get_theguardian_articles, parse_theguardian_article, NoContentException
+from .lang import process_article
+from .scraper import get_theguardian_articles, parse_theguardian_article, NoContentException, historical_news_api
 
 DEFAULT_COUNTRY = "us"
 DEFAULT_YEAR = 1950
-
 
 
 def select_article(articles):
@@ -47,6 +47,10 @@ def main():
         print(exc)
         sys.exit(1)
     print(article_text)
+    related_articles = historical_news_api(args.search)
+    print(len(related_articles))
+    ret = process_article(article_text, related_articles)
+    print(ret)
 
 
 if __name__ == "__main__":
