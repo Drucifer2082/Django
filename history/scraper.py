@@ -3,6 +3,8 @@ import re
 
 import requests
 
+from bs4 import BeautifulSoup as bs
+
 guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
 Article = namedtuple("Article", "title url")
@@ -60,6 +62,21 @@ def  _get_historical_news_search_data(search):
     query = requests.get(url)
     nytimes_historical_results = query.json()
     return nytimes_historical_results
+
+def the_selected_historical_news_article_text(nytimes_historical_results, html):
+    #url = nytimes_historical_results["response"]["docs"][0]['web_url']
+    page = requests.get(url)
+    soup = bs(html, "html.parser")
+
+    for data in soup(['style', 'script']):
+        data.decompose()
+  
+    # return data by retrieving the tag content
+ #   return ' '.join(soup.stripped_strings)
+  
+  
+    # Print the extracted data
+    print(the_selected_historical_news_article_text(page.content)) 
 
 def daily_top_headlines():
     """ shows live headlines in near real time."""
