@@ -9,7 +9,8 @@ guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
 Article = namedtuple("Article", "title url")
 HistoricArticle = namedtuple("HistoricArticle", "print_headline, section_name, lead_paragraph")
-top_headlines_api ="67a718ca0c904911b885f859c255dc21"
+top_headlines_api = "67a718ca0c904911b885f859c255dc21"
+
 
 class NoContentException(Exception):
     pass
@@ -44,24 +45,21 @@ def parse_theguardian_article(url):
     return article
 
 
-def historical_news_api(search):
-    resp = _get_historical_news_search_data(search)
-    """
-    historical_articles = [HistoricArticle(art['headline']['print_headline'], art['section_name'], art            ['lead_paragraph'])
-                    for art in resp['response']['docs'][0]]
-    """
-    # TODO: scrape them!
-    historical_articles = [
-        row["lead_paragraph"] for row in
-        resp['response']['docs']
-    ]
-    return historical_articles
-
 def  _get_historical_news_search_data(search):
-    url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q={search}&api-key={nytimes_historical_api}&show-blocks=all"
+    url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q={search}&api-key={historical_news_api}&show-blocks=all"
     query = requests.get(url)
     nytimes_historical_results = query.json()
     return nytimes_historical_results
+
+
+def historical_news_api(search):
+    resp = _get_historical_news_search_data(search)
+    historical_articles = [HistoricArticle(art['headline']['print_headline'], 
+        art['section_name'], art['lead_paragraph'])
+                    for art in resp['response']['docs'][0]]
+    
+    return historical_articles
+
 
 def the_selected_historical_news_article_text(nytimes_historical_results, html):
     #url = nytimes_historical_results["response"]["docs"][0]['web_url']
@@ -71,12 +69,7 @@ def the_selected_historical_news_article_text(nytimes_historical_results, html):
     for data in soup(['style', 'script']):
         data.decompose()
   
-    # return data by retrieving the tag content
- #   return ' '.join(soup.stripped_strings)
-  
-  
-    # Print the extracted data
-    print(the_selected_historical_news_article_text(page.content)) 
+        print(the_selected_historical_news_article_text(page.content)) 
 
 def daily_top_headlines():
     """ shows live headlines in near real time."""
