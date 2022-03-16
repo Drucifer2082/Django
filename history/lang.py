@@ -35,30 +35,10 @@ def article_analysis(related_articles):
 
 
 def process_article(article, related_articles):
-    processed_article = article_analysis(article, related_articles)
-    article_kw_dict = selected_article_topical_keywords(processed_article)
+    processed_article = article_analysis(article)
     bow_corpus = keywords_into_vectors(processed_article)
-    index, tfidf = training_the_model(bow_corpus)
-    ret = searching_the_articles(index, tfidf, processed_article)
-    return ret
-
-
-def selected_article_topical_keywords(processed_article):
-    dictionary = corpora.Dictionary(processed_article)
-
-    # remove stop words and words that appear only once
-    stop_ids = [
-        dictionary.token2id[stopword]
-        for stopword in STOPLIST
-        if stopword in dictionary.token2id
-        ]
-    once_ids = [tokenid for tokenid, docfreq in dictionary.dfs.items()
-                if docfreq == 1]
-    dictionary.filter_tokens(stop_ids + once_ids)
-    dictionary.compactify()
-    article_keyword_dictionary = dictionary
-    ret = article_keyword_dictionary
-    return ret
+    sims = training_the_model(bow_corpus)
+    return sims
 
 
 def keywords_into_vectors(processed_article):
@@ -67,22 +47,15 @@ def keywords_into_vectors(processed_article):
     return bow_corpus
 
 
-def training_the_model(bow_corpus, dictionary):
-    """TF-IDF is a statistical measure that evaluates
-    how relevant a word is to a document in a
-    collection of documents."""
-    tfidf = models.TfidfModel(bow_corpus)
-    index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus],
+def training_the_model(article, bow_corpus, dictionary):
+    lsi = models.LsiModel(bow_corpus, id2word=dictionary, num_topics=2)
+    vec_bow = dictionary.doc2bow(article.lower().split())
+    vec_lsi = lsi[vec_bow]
+    
+    index = similarities.SparseMatrixSimilarity(lsi[bow_corpus],
             num_best=5, num_features=len(dictionary))
-    return index, tfidf
+    sims = index[vec_lsi]  # perform a similarity query against the corpus
 
+    sims = sorted(enumerate(sims), key=lambda item: -item[1])
 
-def searching_the_articles(index, tfidf, processed_article,
-                            query=DEFAULT_QUERY):
-    dictionary = corpora.Dictionary(processed_article)
-    query_bow = dictionary.doc2bow(query)
-    sims = index[tfidf[query_bow]]
-    print(f"{sims=}")
-    for article_number, score in sorted(enumerate(sims),
-        key=lambda x: x[1], reverse=True):
-        return article_number, score
+    return sims
