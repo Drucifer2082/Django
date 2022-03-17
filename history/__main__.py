@@ -47,10 +47,21 @@ def main():
         print(exc)
         sys.exit(1)
     print(article_text)
-    related_articles = historical_news_api(args.search)
-    print(len(related_articles))
-    ret = process_article(article_text, related_articles)
-    print(ret)
+    related_articles = [
+        art.lead_paragraph for art in
+        historical_news_api(args.search)
+    ]
+
+    print("Original article:")
+    print(article_text)
+    print(f"- {len(related_articles)} related articles found")
+
+    sims = process_article(article_text, related_articles)
+
+    print("Similar articles:")
+    for i, similarity in sims:
+        print(f"{similarity} -> {related_articles[i]}\n")
+    print("---\n")
 
 
 if __name__ == "__main__":
