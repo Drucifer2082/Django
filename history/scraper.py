@@ -46,7 +46,7 @@ def parse_theguardian_article(url):
 
 
 def  _get_historical_news_search_data(search):
-    url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q={search}&api-key={historical_news_api}&show-blocks=all"
+    url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q={search}&api-key={nytimes_historical_api}&show-blocks=all"
     query = requests.get(url)
     nytimes_historical_results = query.json()
     return nytimes_historical_results
