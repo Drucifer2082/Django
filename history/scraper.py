@@ -54,10 +54,12 @@ def  _get_historical_news_search_data(search):
 
 def historical_news_api(search):
     resp = _get_historical_news_search_data(search)
-    historical_articles = [HistoricArticle(art['headline']['print_headline'], 
-        art['section_name'], art['lead_paragraph'])
-                    for art in resp['response']['docs'][0]]
-    
+    historical_articles = [
+        HistoricArticle(art['headline']['print_headline'],
+                        art['section_name'],
+                        art['lead_paragraph'])
+        for art in resp['response']['docs']
+    ]
     return historical_articles
 
 
@@ -68,8 +70,8 @@ def the_selected_historical_news_article_text(nytimes_historical_results, html):
 
     for data in soup(['style', 'script']):
         data.decompose()
-  
-        print(the_selected_historical_news_article_text(page.content)) 
+
+        print(the_selected_historical_news_article_text(page.content))
 
 def daily_top_headlines():
     """ shows live headlines in near real time."""
