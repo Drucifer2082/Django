@@ -1,5 +1,7 @@
 from django.db import models
 
+from history.scraper import DailyNews
+
 
 class Article(models.Model):
     GUARDIAN_UK = "gu"
@@ -7,8 +9,8 @@ class Article(models.Model):
     GOOGLE = "go"
     SOURCES = [
         (GUARDIAN_UK, "Guardian UK"),
-        (HISTORIC_NEWS, "Historical News"),
-        (GOOGLE, "Google"),
+        (HISTORIC_NEWS, "NY Times"),
+        (DailyNews, "Al Jazeera"),
     ]
     title = models.CharField(max_length=128)
     author = models.CharField(max_length=128)

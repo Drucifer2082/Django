@@ -9,8 +9,10 @@
       <br>
       <form method="POST">
         {% csrf_token %}
-        <input type = "text" name = "name" placeholder="Search..." class = "text-center">
+        <input type = "text" name = "name" placeholder="Search..." class = "text-center" hx-post ="{% url 'articles' %}" hx_target = "#articles" hx-trigger = "keyup changed delay: 500ms">
         <button type = "submit" class = "btn-danger btn-sm">SEARCH </button>
       </form>
     </div>
-{% endblock %}
+
+    <div id = "article"></div>
+  {% endblock content %}

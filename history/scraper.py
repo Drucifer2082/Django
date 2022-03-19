@@ -9,8 +9,12 @@ guardian_api_key = "725f716b-09bf-4971-816f-ef6b32061b1b"
 nytimes_historical_api = "K6uJovBQ20GvZDB6e9wAWeoYO6m21rNY"
 Article = namedtuple("Article", "title url")
 HistoricArticle = namedtuple("HistoricArticle", "print_headline, section_name, lead_paragraph")
+DailyNews = namedtuple("DailyNews", "title body")
 top_headlines_api = "67a718ca0c904911b885f859c255dc21"
-
+headers = {
+    'x-rapidapi-host': "contextualwebsearch-websearch-v1.p.rapidapi.com",
+    'x-rapidapi-key': "38c3a26bf6msh7b78364c9cb74afp18a2ddjsnef679721e0c0"
+    }
 
 class NoContentException(Exception):
     pass
@@ -64,7 +68,6 @@ def historical_news_api(search):
 
 
 def the_selected_historical_news_article_text(nytimes_historical_results, html):
-    #url = nytimes_historical_results["response"]["docs"][0]['web_url']
     page = requests.get(url)
     soup = bs(html, "html.parser")
 
@@ -73,40 +76,22 @@ def the_selected_historical_news_article_text(nytimes_historical_results, html):
 
         print(the_selected_historical_news_article_text(page.content))
 
-def daily_top_headlines():
-    """ shows live headlines in near real time."""
-    url = (f'https://newsapi.org/v2/top-headlines?'
-           'country=us&'
-           'apiKey={top_headlines_api}')
-    response = requests.get(url)
-    top_headlines = response.json()
-    return top_headlines
+def _daily_news(search):
+    url = "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/NewsSearchAPI"
+    param_search = {"q":{search}}
+    response = requests.get(url, headers=headers, params= param_search)
+    text = response.json()
+    article = text['value'][0]['body']
+    art = re.sub('<[^<]+?>', '', article)
+    return art
 
-def parse_daily_top_headlines_titles():
-    url = url = ('https://newsapi.org/v2/top-headlines?'
-           'country=us&'
-           'apiKey={top_headlines_api}')
-    query = requests.get(url)
-    ret = query.json()
-    try:
-        ret = ret["articles"][0]['title']
-    except IndexError:
-        raise NoContentException(f"cannot retrieve article content of {url}")
-    # strip html tags off
-    return re.sub('<[^<]+?>', '', ret)
-
-def parse_daily_top_headlines_content():
-    url = url = ('https://newsapi.org/v2/top-headlines?'
-           'country=us&'
-           'apiKey=67a718ca0c904911b885f859c255dc21')
-    query = requests.get(url)
-    ret = query.json()
-    try:
-        ret = ret['articles'][0]['content']
-    except IndexError:
-        raise NoContentException(f"cannot retrieve article content of {url}")
-    # strip html tags off
-    return re.sub('<[^<]+?>', '', ret)
+def daily_news(search):
+    resp = _daily_news(search)
+    daily_news_articles = [
+            DailyNews(art['title'], art['body'])
+                for art in resp['value']['body']
+    ]
+    return daily_news_articles
 
 if __name__ == "__main__":
     # you can run this script as: $ python -m news.scraper
